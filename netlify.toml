@@ -1,0 +1,20 @@
+[build]
+  # TanStack Start v1.x (Vite Environment API) outputs:
+  #   dist/client/   → static assets served by Netlify CDN
+  #   dist/server/   → the SSR server bundle (used by the Netlify Function)
+  command = "npm run build"
+  publish = "dist/client"
+
+[build.environment]
+  # Node.js 20 LTS — required by TanStack Start server functions
+  NODE_VERSION = "20"
+
+# Route all non-static requests to the SSR Netlify Function.
+# The function imports the built server bundle from dist/server/.
+[[redirects]]
+  from   = "/*"
+  to     = "/.netlify/functions/server"
+  status = 200
+
+  # Don't redirect actual static asset requests (JS/CSS/images)
+  conditions = { Language = [] }
