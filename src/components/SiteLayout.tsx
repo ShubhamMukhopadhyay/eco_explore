@@ -59,7 +59,7 @@ export function SiteLayout() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="sticky top-0 z-50 px-4 pt-4">
+      <header className="sticky top-0 z-50 px-4">
         <div className="mx-auto max-w-7xl glass-strong rounded-2xl shadow-soft px-4 sm:px-6 py-3 flex items-center justify-between relative z-10">
           <Link to="/" className="flex items-center gap-2 group">
             <div className="size-9 rounded-xl bg-gradient-eco grid place-items-center shadow-glow">

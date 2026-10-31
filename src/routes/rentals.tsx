@@ -51,10 +51,30 @@ function RentalsPage() {
       toast.error("Please fill name, phone and pickup date.");
       return;
     }
+    const phoneDigits = phone.replace(/\D/g, "");
+    if (phoneDigits.length < 7 || phoneDigits.length > 15) {
+      toast.error("Please enter a valid phone number with country code.");
+      return;
+    }
     const ref = "EX-" + Math.random().toString(36).slice(2, 8).toUpperCase();
     setConfirmed({ ref, total });
     toast.success(`Booking confirmed · ${ref}`);
   };
+
+  const whatsappMessage = confirmed
+    ? [
+        `Hi ${name}, your EcoExplore bike rental is confirmed!`,
+        `Reference: ${confirmed.ref}`,
+        `Bike: ${bike.name} × ${qty}`,
+        `Duration: ${plan.label} (${plan.hours}h)`,
+        `Pickup: ${pickup} on ${date}`,
+        `Estimated total: ₹${confirmed.total}`,
+        "Please reply here if you need help. See you in Goa!",
+      ].join("\n")
+    : "";
+  const whatsappUrl = confirmed
+    ? `https://wa.me/${phone.replace(/\D/g, "")}?text=${encodeURIComponent(whatsappMessage)}`
+    : "";
 
   return (
     <div className="mx-auto max-w-7xl px-6 pt-12 pb-20">
@@ -93,8 +113,18 @@ function RentalsPage() {
             <Detail label="Pickup" value={`${pickup} · ${date}`} />
             <Detail label="Total" value={`₹${confirmed.total}`} />
           </div>
-          <p className="text-sm text-muted-foreground mt-6">A WhatsApp confirmation will reach you on {phone} shortly.</p>
+          <p className="text-sm text-muted-foreground mt-6">
+            Open WhatsApp to review the confirmation for {phone}. You’ll need to tap Send in WhatsApp.
+          </p>
           <div className="mt-6 flex gap-3 justify-center flex-wrap">
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-2.5 rounded-full bg-eco text-primary-foreground text-sm hover:opacity-90 transition"
+            >
+              Send confirmation on WhatsApp
+            </a>
             <button onClick={() => setConfirmed(null)} className="px-5 py-2.5 rounded-full bg-secondary text-secondary-foreground text-sm hover:bg-accent transition">Book another</button>
             <Link to="/maps" className="px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-sm shadow-soft hover:opacity-90 transition">Plan your ride</Link>
           </div>
@@ -162,7 +192,7 @@ function RentalsPage() {
               <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Riya Sharma" className="bg-transparent outline-none flex-1 text-sm" />
             </Field>
             <Field icon={Phone} label="Phone">
-              <input value={phone} onChange={e => setPhone(e.target.value)} type="tel" placeholder="+91 ..." className="bg-transparent outline-none flex-1 text-sm" />
+              <input value={phone} onChange={e => setPhone(e.target.value)} type="tel" placeholder="+91 ..." autoComplete="tel" className="bg-transparent outline-none flex-1 text-sm" />
             </Field>
             <Field icon={Mail} label="Email (optional)">
               <input value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder="you@email.com" className="bg-transparent outline-none flex-1 text-sm" />
