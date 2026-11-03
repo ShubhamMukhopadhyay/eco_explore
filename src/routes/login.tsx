@@ -45,7 +45,7 @@ function LoginPage() {
           email, password,
           options: {
             emailRedirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
-            data: { full_name: name },
+            data: { username: name.trim(), full_name: name.trim() },
           },
         });
         if (error) throw error;
@@ -102,7 +102,7 @@ function LoginPage() {
 
           <form onSubmit={handleEmail} className="mt-7 space-y-3">
             {mode === "signup" && (
-              <Input icon={<Sparkles className="size-4" />} type="text" placeholder="Full name" value={name} onChange={setName} />
+              <Input icon={<Sparkles className="size-4" />} type="text" placeholder="Username" value={name} onChange={setName} required />
             )}
             <Input icon={<Mail className="size-4" />} type="email" placeholder="you@email.com" value={email} onChange={setEmail} required />
             <Input icon={<Lock className="size-4" />} type="password" placeholder="Password (min 6 chars)" value={password} onChange={setPassword} required minLength={6} />

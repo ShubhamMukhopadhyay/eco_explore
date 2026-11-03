@@ -5,6 +5,8 @@ import { Bike, Clock, IndianRupee, CheckCircle2, Leaf, MapPin, Phone, Mail, User
 import { SectionHeader } from "@/components/SectionHeader";
 import { toast } from "sonner";
 import bikeRentalImg from "@/assets/bike-rental.jpg";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/rentals")({
   head: () => ({
@@ -31,6 +33,7 @@ const PLANS = [
 const PICKUPS = ["Anjuna", "Vagator", "Assagao", "Panjim", "Palolem", "Morjim"];
 
 function RentalsPage() {
+  const { user } = useAuth();
   const [bikeId, setBikeId] = useState("city");
   const [planId, setPlanId] = useState("half");
   const [qty, setQty] = useState(1);
@@ -40,12 +43,13 @@ function RentalsPage() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [confirmed, setConfirmed] = useState<null | { ref: string; total: number }>(null);
+  const [saving, setSaving] = useState(false);
 
   const bike = BIKES.find(b => b.id === bikeId)!;
   const plan = PLANS.find(p => p.id === planId)!;
   const total = useMemo(() => Math.round(bike.price * plan.multiplier * qty), [bike, plan, qty]);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !phone || !date) {
       toast.error("Please fill name, phone and pickup date.");
@@ -57,8 +61,35 @@ function RentalsPage() {
       return;
     }
     const ref = "EX-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-    setConfirmed({ ref, total });
-    toast.success(`Booking confirmed · ${ref}`);
+    setSaving(true);
+    try {
+      const { error } = await supabase.from("bike_rentals").insert({
+        booking_reference: ref,
+        user_id: user?.id ?? null,
+        customer_name: name.trim(),
+        phone: phone.trim(),
+        email: email.trim() || null,
+        bike_id: bike.id,
+        bike_name: bike.name,
+        quantity: qty,
+        duration_id: plan.id,
+        duration_label: plan.label,
+        duration_hours: plan.hours,
+        pickup_location: pickup,
+        pickup_date: date,
+        estimated_total: total,
+      });
+      if (error) {
+        toast.error(`Could not save your booking: ${error.message}`);
+        return;
+      }
+      setConfirmed({ ref, total });
+      toast.success(`Booking confirmed · ${ref}`);
+    } catch (error) {
+      toast.error(`Could not save your booking: ${error instanceof Error ? error.message : "Unexpected error"}`);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const whatsappMessage = confirmed
@@ -219,8 +250,8 @@ function RentalsPage() {
               </div>
             </div>
 
-            <button type="submit" className="mt-5 w-full px-5 py-3 rounded-full bg-primary text-primary-foreground font-medium shadow-soft hover:opacity-90 transition">
-              Confirm booking
+            <button type="submit" disabled={saving} className="mt-5 w-full px-5 py-3 rounded-full bg-primary text-primary-foreground font-medium shadow-soft hover:opacity-90 transition disabled:opacity-60">
+              {saving ? "Saving booking..." : "Confirm booking"}
             </button>
             <p className="text-[11px] text-muted-foreground text-center mt-3">Pay on pickup · Free cancellation up to 2 hrs before</p>
           </form>

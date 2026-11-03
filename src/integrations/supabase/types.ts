@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      bike_rentals: {
+        Row: {
+          bike_id: string
+          bike_name: string
+          booking_reference: string
+          created_at: string
+          customer_name: string
+          duration_hours: number
+          duration_id: string
+          duration_label: string
+          email: string | null
+          estimated_total: number
+          id: string
+          phone: string
+          pickup_date: string
+          pickup_location: string
+          quantity: number
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          bike_id: string
+          bike_name: string
+          booking_reference: string
+          created_at?: string
+          customer_name: string
+          duration_hours: number
+          duration_id: string
+          duration_label: string
+          email?: string | null
+          estimated_total: number
+          id?: string
+          phone: string
+          pickup_date: string
+          pickup_location: string
+          quantity: number
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          bike_id?: string
+          bike_name?: string
+          booking_reference?: string
+          created_at?: string
+          customer_name?: string
+          duration_hours?: number
+          duration_id?: string
+          duration_label?: string
+          email?: string | null
+          estimated_total?: number
+          id?: string
+          phone?: string
+          pickup_date?: string
+          pickup_location?: string
+          quantity?: number
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -23,6 +83,7 @@ export type Database = {
           full_name: string | null
           id: string
           updated_at: string
+          username: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -32,6 +93,7 @@ export type Database = {
           full_name?: string | null
           id: string
           updated_at?: string
+          username?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -41,6 +103,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
